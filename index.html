@@ -5,13 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body>
+
     <p id="demo">Click the button to get your position:</p>
-    <button onclick="getAccurateLocation()">Get Location</button>
-    <p id="lat"></p>
-    <p id="long"></p>
-    <p id="accuracy"></p>
+    <!-- <button onclick="getAccurateLocation()">Get Location</button> -->
+    <p id="lat" style="color:green;"></p>
+    <input type="file" id="fileInput" accept="image/*" capture="user" onchange="previewImage(event)" />
+    <img id="capturedImage" src="" alt="Captured Image" style="display:none; max-width: 50%; margin-top: 20px;" />
     <script type="text/javascript">
+         function previewImage(event) {
+            var file = event.target.files[0]; // Get the selected file
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Display the captured image in an img tag
+                    var capturedImage = document.getElementById('capturedImage');
+                    capturedImage.src = e.target.result;
+                    capturedImage.style.display = "block"; // Show the image
+                };
+                getAccurateLocation();
+                reader.readAsDataURL(file); // Read the file as DataURL
+            }
+        }
         function getAccurateLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -20,12 +36,28 @@
                         const lng = position.coords.longitude;
                         const accuracy = position.coords.accuracy;
     
-                        console.log("Lat:", lat, "Lng:", lng, "Accuracy:", accuracy);
+                        // console.log("Lat:", lat, "Lng:", lng, "Accuracy:", accuracy);
     
-                        // Set values to hidden fields
-                        document.getElementById('lat').innerHTML = lat;
-             document.getElementById('long').innerHTML = lng;
-             document.getElementById('accuracy').innerHTML=  accuracy;
+                        if (accuracy <= 50)
+                        {
+                            // GPS location good enough for geofencing
+                            // document.getElementById('lat').innerHTML = lat;
+                            document.getElementById('lat').innerText= "📍 Accurate Location: "+lat+", "+lng+" (± "+accuracy+" m)";
+                        }
+                        else if (accuracy > 50)
+                        {
+                            // document.getElementById('lat').innerHTML = lat;
+                            document.getElementById('lat').innerText= "⚠️ Location not accurate enough (±"+accuracy+" m).";
+                        }
+                        
+                        else 
+                        {
+                            document.getElementById('lat').interHTML="❌ Failed to retrieve location data.";
+                        }
+            //             // Set values to hidden fields
+            //             document.getElementById('lat').innerHTML = lat;
+            //  document.getElementById('long').innerHTML = lng;
+            //  document.getElementById('accuracy').innerHTML=  accuracy;
     
             
          },
